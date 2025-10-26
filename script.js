@@ -78,8 +78,25 @@ function updateUrl() {
     const color = encodeURIComponent(colorInput.value);
 
     const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-    const url = `${baseUrl}resim.html?text=${text}&size=${fontSize}&color=${color}`;
-
-    generatedUrl.textContent = url;
+    
+    // Hem .jpg hem .png hem .html URL'lerini göster
+    const urls = [
+        `${baseUrl}resim.png?text=${text}&size=${fontSize}&color=${color}`,
+        `${baseUrl}resim.jpg?text=${text}&size=${fontSize}&color=${color}`,
+        `${baseUrl}resim.html?text=${text}&size=${fontSize}&color=${color}`
+    ];
+    
+    generatedUrl.innerHTML = `
+        <strong>Discord için URL'ler (hepsini deneyebilirsiniz):</strong><br>
+        <div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">
+            <strong>PNG:</strong> ${urls[0]}
+        </div>
+        <div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">
+            <strong>JPG:</strong> ${urls[1]}
+        </div>
+        <div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">
+            <strong>HTML:</strong> ${urls[2]}
+        </div>
+    `;
 }
 
