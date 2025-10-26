@@ -3,13 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dinamik Resim</title>
-    <meta property="og:title" content="Dinamik Resim">
+    <title id="page-title">Dinamik Resim</title>
+    
+    <!-- Discord/Social Media Meta Tags -->
     <meta property="og:type" content="website">
-    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:site_name" content="Dinamik Resim Oluşturucu">
+    <meta property="og:title" id="og-title" content="Dinamik Resim">
+    <meta property="og:description" id="og-description" content="Özel metin ile oluşturulmuş resim">
+    <meta property="og:image" id="og-image" content="">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="800">
     <meta property="og:image:height" content="400">
+    <meta property="og:image:alt" id="og-image-alt" content="Dinamik oluşturulmuş resim">
+    
+    <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="Dinamik Resim">
+    <meta name="twitter:description" id="twitter-description" content="Özel metin ile oluşturulmuş resim">
+    <meta name="twitter:image" id="twitter-image" content="">
+    <meta name="twitter:image:alt" id="twitter-image-alt" content="Dinamik oluşturulmuş resim">
+    
+    <!-- Discord özel meta tag'lar -->
+    <meta name="theme-color" content="#667eea">
+    <meta property="og:url" id="og-url" content="">
     <style>
         body {
             margin: 0;
@@ -69,38 +85,54 @@
             lines.forEach((line, index) => {
                 ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
             });
-            
-            // Meta tag'ları güncelle
-            const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            
-            // Mevcut meta tag'ları güncelle
-            let ogImage = document.querySelector('meta[property="og:image"]');
-            if (!ogImage) {
-                ogImage = document.createElement('meta');
-                ogImage.setAttribute('property', 'og:image');
-                document.head.appendChild(ogImage);
-            }
-            ogImage.setAttribute('content', imageDataUrl);
-            
-            let twitterImage = document.querySelector('meta[name="twitter:image"]');
-            if (!twitterImage) {
-                twitterImage = document.createElement('meta');
-                twitterImage.setAttribute('name', 'twitter:image');
-                document.head.appendChild(twitterImage);
-            }
-            twitterImage.setAttribute('content', imageDataUrl);
-            
-            // Title'ı güncelle
-            document.title = text.substring(0, 50) + (text.length > 50 ? '...' : '');
-            
-            let ogTitle = document.querySelector('meta[property="og:title"]');
-            if (ogTitle) {
-                ogTitle.setAttribute('content', document.title);
-            }
         }
         
-        // Resmi çiz
+        function updateMetaTags() {
+            // Resmi PNG olarak al (daha iyi kalite)
+            const imageDataUrl = canvas.toDataURL('image/png', 1.0);
+            const currentUrl = window.location.href;
+            const shortText = text.substring(0, 50) + (text.length > 50 ? '...' : '');
+            const description = `"${shortText}" metni ile oluşturulmuş dinamik resim`;
+            
+            // Title güncelle
+            document.title = shortText;
+            document.getElementById('page-title').textContent = shortText;
+            
+            // Open Graph meta tag'ları güncelle
+            document.getElementById('og-title').setAttribute('content', shortText);
+            document.getElementById('og-description').setAttribute('content', description);
+            document.getElementById('og-image').setAttribute('content', imageDataUrl);
+            document.getElementById('og-image-alt').setAttribute('content', description);
+            document.getElementById('og-url').setAttribute('content', currentUrl);
+            
+            // Twitter meta tag'ları güncelle
+            document.getElementById('twitter-title').setAttribute('content', shortText);
+            document.getElementById('twitter-description').setAttribute('content', description);
+            document.getElementById('twitter-image').setAttribute('content', imageDataUrl);
+            document.getElementById('twitter-image-alt').setAttribute('content', description);
+            
+            // Favicon olarak da ayarla
+            let favicon = document.querySelector('link[rel="icon"]');
+            if (!favicon) {
+                favicon = document.createElement('link');
+                favicon.rel = 'icon';
+                document.head.appendChild(favicon);
+            }
+            favicon.href = imageDataUrl;
+        }
+        
+        // Resmi çiz ve meta tag'ları güncelle
         drawImage();
+        
+        // Meta tag'ları güncellemek için kısa bir gecikme
+        setTimeout(() => {
+            updateMetaTags();
+        }, 100);
+        
+        // Sayfa yüklendiğinde de güncelle
+        window.addEventListener('load', () => {
+            updateMetaTags();
+        });
     </script>
 </body>
 </html>

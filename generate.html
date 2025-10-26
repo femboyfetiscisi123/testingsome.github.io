@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resim Oluşturucu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #5a6fd8;
+        }
+        .preview {
+            margin: 20px 0;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .download-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .url-box {
+            background: white;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Discord Embed Resim Oluşturucu</h1>
+        <p>Resminizi oluşturun ve Discord'da paylaşın!</p>
+        
+        <div class="form-group">
+            <label for="textInput">Metin:</label>
+            <textarea id="textInput" placeholder="Yazmak istediğiniz metni girin..." rows="3">Merhaba Discord!</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="fontSizeInput">Font Boyutu: <span id="fontSizeValue">40px</span></label>
+            <input type="range" id="fontSizeInput" min="20" max="100" value="40">
+        </div>
+        
+        <div class="form-group">
+            <label for="colorInput">Metin Rengi:</label>
+            <input type="color" id="colorInput" value="#ffffff">
+        </div>
+        
+        <div class="preview">
+            <canvas id="canvas" width="800" height="400"></canvas>
+        </div>
+        
+        <button onclick="generateImage()">Resim Oluştur ve İndir</button>
+        
+        <div class="download-section">
+            <h3>Discord için URL:</h3>
+            <div class="url-box" id="discordUrl">
+                Resim oluşturduktan sonra URL burada görünecek...
+            </div>
+            <button onclick="copyUrl()">URL'yi Kopyala</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const textInput = document.getElementById('textInput');
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const colorInput = document.getElementById('colorInput');
+        const discordUrl = document.getElementById('discordUrl');
+        
+        let imageCounter = 1;
+        
+        function updatePreview() {
+            const text = textInput.value || 'Merhaba Discord!';
+            const fontSize = parseInt(fontSizeInput.value);
+            const color = colorInput.value;
+            
+            // Canvas'ı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gradient arka plan
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Metin ayarları
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            // Metni çiz
+            const lines = text.split('\n');
+            const lineHeight = fontSize * 1.2;
+            const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
+            });
+        }
+        
+        function generateImage() {
+            updatePreview();
+            
+            // Resmi indir
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `discord-image-${imageCounter}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                // Discord URL'sini güncelle
+                const fileName = `discord-image-${imageCounter}.png`;
+                const baseUrl = window.location.origin + window.location.pathname.replace('generate.html', '');
+                const fullUrl = `${baseUrl}${fileName}`;
+                
+                discordUrl.innerHTML = `
+                    <strong>1. Adım:</strong> İndirilen resmi GitHub repository'nizin ana dizinine yükleyin<br>
+                    <strong>2. Adım:</strong> Bu URL'yi Discord'da paylaşın:<br>
+                    <code>${fullUrl}</code><br><br>
+                    <strong>Alternatif:</strong> Dinamik URL (resim.html):<br>
+                    <code>${baseUrl}resim.html?text=${encodeURIComponent(textInput.value)}&size=${fontSizeInput.value}&color=${encodeURIComponent(colorInput.value)}</code>
+                `;
+                
+                imageCounter++;
+            }, 'image/png', 1.0);
+        }
+        
+        function copyUrl() {
+            const text = discordUrl.textContent;
+            const urlMatch = text.match(/https?:\/\/[^\s]+/);
+            if (urlMatch) {
+                navigator.clipboard.writeText(urlMatch[0]).then(() => {
+                    alert('URL kopyalandı!');
+                });
+            }
+        }
+        
+        // Event listeners
+        textInput.addEventListener('input', updatePreview);
+        fontSizeInput.addEventListener('input', () => {
+            fontSizeValue.textContent = fontSizeInput.value + 'px';
+            updatePreview();
+        });
+        colorInput.addEventListener('input', updatePreview);
+        
+        // İlk önizleme
+        updatePreview();
+    </script>
+</body>
+</html>
