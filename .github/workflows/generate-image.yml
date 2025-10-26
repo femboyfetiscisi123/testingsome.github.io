@@ -1,0 +1,46 @@
+name: Generate OG Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'Görselde gösterilecek metin'
+        required: true
+        default: 'Merhaba GitHub Pages'
+      filename:
+        description: 'Dosya adı (uzantı otomatik .png)'
+        required: false
+        default: 'og-image'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install canvas
+        run: |
+          npm init -y
+          npm install canvas
+
+      - name: Generate image
+        env:
+          TEXT: ${{ github.event.inputs.text }}
+          FILENAME: ${{ github.event.inputs.filename }}
+        run: node scripts/generate.js
+
+      - name: Commit generated image
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/*
+          git commit -m "Add generated image: ${{ github.event.inputs.filename }}" || echo "No changes to commit"
+          git push
