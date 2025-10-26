@@ -39,34 +39,34 @@ function updateCanvas() {
     const text = textInput.value || 'Merhaba Dünya!';
     const fontSize = parseInt(fontSizeInput.value);
     const color = colorInput.value;
-    
+
     // Canvas'ı temizle
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     // Gradient arka plan
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
     gradient.addColorStop(0, '#667eea');
     gradient.addColorStop(1, '#764ba2');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
     // Metin ayarları
     ctx.font = `bold ${fontSize}px Arial`;
     ctx.fillStyle = color;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    
+
     // Metin gölgesi
     ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
     ctx.shadowBlur = 4;
     ctx.shadowOffsetX = 2;
     ctx.shadowOffsetY = 2;
-    
+
     // Metni çiz (çok satırlı destek)
     const lines = text.split('\n');
     const lineHeight = fontSize * 1.2;
     const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
-    
+
     lines.forEach((line, index) => {
         ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
     });
@@ -76,58 +76,10 @@ function updateUrl() {
     const text = encodeURIComponent(textInput.value || 'Merhaba Dünya!');
     const fontSize = fontSizeInput.value;
     const color = encodeURIComponent(colorInput.value);
-    
-    const baseUrl = window.location.origin + window.location.pathname;
-    const url = `${baseUrl}resim.jpg?text=${text}&size=${fontSize}&color=${color}`;
-    
+
+    const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
+    const url = `${baseUrl}resim.html?text=${text}&size=${fontSize}&color=${color}`;
+
     generatedUrl.textContent = url;
 }
 
-// Eğer resim.jpg endpoint'i çağrılırsa, canvas'ı resim olarak döndür
-if (window.location.pathname.endsWith('resim.jpg')) {
-    // Parametreleri al
-    const text = decodeURIComponent(urlParams.get('text') || 'Merhaba Dünya!');
-    const fontSize = parseInt(urlParams.get('size') || '40');
-    const color = decodeURIComponent(urlParams.get('color') || '#ffffff');
-    
-    // Canvas'ı güncelle
-    setTimeout(() => {
-        // Font ayarları
-        ctx.font = `bold ${fontSize}px Arial`;
-        ctx.fillStyle = color;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Canvas'ı temizle
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Gradient arka plan
-        const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, '#667eea');
-        gradient.addColorStop(1, '#764ba2');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Metin ayarları
-        ctx.fillStyle = color;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-        ctx.shadowBlur = 4;
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 2;
-        
-        // Metni çiz
-        const lines = text.split('\n');
-        const lineHeight = fontSize * 1.2;
-        const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
-        
-        lines.forEach((line, index) => {
-            ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
-        });
-        
-        // Canvas'ı resim olarak göster
-        canvas.toBlob((blob) => {
-            const url = URL.createObjectURL(blob);
-            window.location.replace(url);
-        }, 'image/jpeg', 0.9);
-    }, 100);
-}
