@@ -166,12 +166,40 @@
                 const baseUrl = window.location.origin + window.location.pathname.replace('generate.html', '');
                 const fullUrl = `${baseUrl}${fileName}`;
                 
+                // Dinamik URL'ler - Discord'da çalışan formatlar
+                const dynamicUrls = {
+                    jpg: `${baseUrl}resim.jpg?text=${encodeURIComponent(textInput.value)}&size=${fontSizeInput.value}&color=${encodeURIComponent(colorInput.value)}`,
+                    png: `${baseUrl}resim.png?text=${encodeURIComponent(textInput.value)}&size=${fontSizeInput.value}&color=${encodeURIComponent(colorInput.value)}`,
+                    html: `${baseUrl}resim.html?text=${encodeURIComponent(textInput.value)}&size=${fontSizeInput.value}&color=${encodeURIComponent(colorInput.value)}`
+                };
+                
                 discordUrl.innerHTML = `
-                    <strong>1. Adım:</strong> İndirilen resmi GitHub repository'nizin ana dizinine yükleyin<br>
-                    <strong>2. Adım:</strong> Bu URL'yi Discord'da paylaşın:<br>
-                    <code>${fullUrl}</code><br><br>
-                    <strong>Alternatif:</strong> Dinamik URL (resim.html):<br>
-                    <code>${baseUrl}resim.html?text=${encodeURIComponent(textInput.value)}&size=${fontSizeInput.value}&color=${encodeURIComponent(colorInput.value)}</code>
+                    <div style="margin-bottom: 15px;">
+                        <strong>🎯 Discord Embed URL'leri (Hemen Kullanılabilir):</strong>
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px; border-left: 4px solid #28a745;">
+                        <strong>✅ JPG (En İyi - Çalışıyor):</strong><br>
+                        <code style="word-break: break-all;">${dynamicUrls.jpg}</code>
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        <strong>🔄 PNG (Deneme):</strong><br>
+                        <code style="word-break: break-all;">${dynamicUrls.png}</code>
+                    </div>
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+                        <strong>📄 HTML (Bazen Çalışır):</strong><br>
+                        <code style="word-break: break-all;">${dynamicUrls.html}</code>
+                    </div>
+                    
+                    <hr style="margin: 15px 0;">
+                    
+                    <div style="margin: 10px 0; padding: 10px; background: #d1ecf1; border-radius: 5px; border-left: 4px solid #17a2b8;">
+                        <strong>💾 Statik Yöntem (En Güvenilir):</strong><br>
+                        1. İndirilen resmi GitHub'a yükleyin<br>
+                        2. Bu URL'yi kullanın: <code>${fullUrl}</code>
+                    </div>
                 `;
                 
                 imageCounter++;
@@ -179,13 +207,19 @@
         }
         
         function copyUrl() {
-            const text = discordUrl.textContent;
-            const urlMatch = text.match(/https?:\/\/[^\s]+/);
-            if (urlMatch) {
-                navigator.clipboard.writeText(urlMatch[0]).then(() => {
-                    alert('URL kopyalandı!');
-                });
-            }
+            // En iyi URL'yi (JPG) kopyala
+            const text = encodeURIComponent(textInput.value || 'Merhaba Discord!');
+            const fontSize = fontSizeInput.value;
+            const color = encodeURIComponent(colorInput.value);
+            const baseUrl = window.location.origin + window.location.pathname.replace('generate.html', '');
+            const bestUrl = `${baseUrl}resim.jpg?text=${text}&size=${fontSize}&color=${color}`;
+            
+            navigator.clipboard.writeText(bestUrl).then(() => {
+                alert('✅ En iyi Discord URL kopyalandı! (JPG formatı)\n\nDiscord\'da paylaşabilirsiniz.');
+            }).catch(() => {
+                // Fallback - manuel kopyalama için
+                prompt('Bu URL\'yi kopyalayın:', bestUrl);
+            });
         }
         
         // Event listeners

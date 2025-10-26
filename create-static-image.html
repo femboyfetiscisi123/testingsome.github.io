@@ -228,21 +228,24 @@
                 `${baseUrl}resim.html?text=${text}&size=${fontSize}&color=${color}`
             ];
 
-            currentUrl = urls[0]; // PNG URL'sini varsayılan yap
+            currentUrl = urls[1]; // JPG URL'sini varsayılan yap (en iyi çalışan)
 
             urlDisplay.innerHTML = `
-                <strong>Discord için URL'ler:</strong><br><br>
-                <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
-                    <strong>🎯 En İyi (PNG):</strong><br>
-                    <code>${urls[0]}</code>
+                <strong>Discord Embed URL'leri:</strong><br><br>
+                <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px; border-left: 4px solid #28a745;">
+                    <strong>✅ JPG (Çalışıyor - ÖNERİLEN):</strong><br>
+                    <code style="word-break: break-all;">${urls[1]}</code>
                 </div>
-                <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-radius: 5px;">
-                    <strong>📷 JPG:</strong><br>
-                    <code>${urls[1]}</code>
+                <div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-radius: 5px; border-left: 4px solid #ffc107;">
+                    <strong>� PNG <(Deneme):</strong><br>
+                    <code style="word-break: break-all;">${urls[0]}</code>
                 </div>
-                <div style="margin: 10px 0; padding: 10px; background: #f8d7da; border-radius: 5px;">
-                    <strong>🌐 HTML:</strong><br>
-                    <code>${urls[2]}</code>
+                <div style="margin: 10px 0; padding: 10px; background: #f8d7da; border-radius: 5px; border-left: 4px solid #dc3545;">
+                    <strong>📄 HTML (Bazen Çalışır):</strong><br>
+                    <code style="word-break: break-all;">${urls[2]}</code>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 5px;">
+                    <strong>💡 İpucu:</strong> JPG formatı Discord'da en iyi çalışır!
                 </div>
             `;
 
@@ -252,7 +255,10 @@
         function copyToClipboard() {
             if (currentUrl) {
                 navigator.clipboard.writeText(currentUrl).then(() => {
-                    alert('📋 URL kopyalandı! Discord\'da paylaşabilirsiniz.');
+                    alert('✅ En iyi Discord URL kopyalandı! (JPG formatı)\n\nBu URL Discord\'da embed olarak görünecek.');
+                }).catch(() => {
+                    // Fallback - manuel kopyalama için
+                    prompt('Bu URL\'yi kopyalayın:', currentUrl);
                 });
             }
         }
