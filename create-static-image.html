@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
             margin: 20px;
             background: #f0f0f0;
         }
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -17,21 +19,27 @@
             padding: 20px;
             border-radius: 10px;
         }
+
         .form-group {
             margin: 15px 0;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, textarea, button {
+
+        input,
+        textarea,
+        button {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             box-sizing: border-box;
         }
+
         button {
             background: #667eea;
             color: white;
@@ -40,23 +48,28 @@
             font-size: 16px;
             margin: 5px 0;
         }
+
         button:hover {
             background: #5a6fd8;
         }
+
         .preview {
             margin: 20px 0;
             text-align: center;
         }
+
         canvas {
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         .instructions {
             background: #e3f2fd;
             padding: 15px;
             border-radius: 5px;
             margin: 20px 0;
         }
+
         .url-box {
             background: #f8f9fa;
             padding: 10px;
@@ -67,34 +80,36 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎯 Discord Embed Resim Oluşturucu</h1>
         <p><strong>Bu araç Discord'da %100 çalışan embed resimleri oluşturur!</strong></p>
-        
+
         <div class="form-group">
             <label for="textInput">Metin:</label>
-            <textarea id="textInput" placeholder="Discord'da gösterilecek metni yazın..." rows="3">Merhaba Discord!</textarea>
+            <textarea id="textInput" placeholder="Discord'da gösterilecek metni yazın..."
+                rows="3">Merhaba Discord!</textarea>
         </div>
-        
+
         <div class="form-group">
             <label for="fontSizeInput">Font Boyutu: <span id="fontSizeValue">40px</span></label>
             <input type="range" id="fontSizeInput" min="20" max="100" value="40">
         </div>
-        
+
         <div class="form-group">
             <label for="colorInput">Metin Rengi:</label>
             <input type="color" id="colorInput" value="#ffffff">
         </div>
-        
+
         <div class="preview">
             <canvas id="canvas" width="800" height="400"></canvas>
         </div>
-        
+
         <button onclick="downloadAsResimPng()">📥 resim.png olarak İndir</button>
         <button onclick="downloadAsResimJpg()">📥 resim.jpg olarak İndir</button>
         <button onclick="generateDynamicUrl()">🔗 Dinamik URL Oluştur</button>
-        
+
         <div class="instructions">
             <h3>📋 Discord Embed için Adımlar:</h3>
             <ol>
@@ -113,7 +128,7 @@
                 </li>
             </ol>
         </div>
-        
+
         <div id="urlSection" style="display: none;">
             <h3>🔗 Oluşturulan URL'ler:</h3>
             <div class="url-box" id="urlDisplay"></div>
@@ -130,24 +145,24 @@
         const colorInput = document.getElementById('colorInput');
         const urlSection = document.getElementById('urlSection');
         const urlDisplay = document.getElementById('urlDisplay');
-        
+
         let currentUrl = '';
-        
+
         function updatePreview() {
             const text = textInput.value || 'Merhaba Discord!';
             const fontSize = parseInt(fontSizeInput.value);
             const color = colorInput.value;
-            
+
             // Canvas'ı temizle
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
+
             // Gradient arka plan
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#667eea');
             gradient.addColorStop(1, '#764ba2');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             // Metin ayarları
             ctx.font = `bold ${fontSize}px Arial`;
             ctx.fillStyle = color;
@@ -157,17 +172,17 @@
             ctx.shadowBlur = 4;
             ctx.shadowOffsetX = 2;
             ctx.shadowOffsetY = 2;
-            
+
             // Metni çiz
             const lines = text.split('\n');
             const lineHeight = fontSize * 1.2;
             const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
-            
+
             lines.forEach((line, index) => {
                 ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
             });
         }
-        
+
         function downloadAsResimPng() {
             updatePreview();
             canvas.toBlob((blob) => {
@@ -179,11 +194,11 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
+
                 alert('✅ resim.png indirildi! Bu dosyayı GitHub repository\'nizin ana dizinine yükleyin.');
             }, 'image/png', 1.0);
         }
-        
+
         function downloadAsResimJpg() {
             updatePreview();
             canvas.toBlob((blob) => {
@@ -195,26 +210,26 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
+
                 alert('✅ resim.jpg indirildi! Bu dosyayı GitHub repository\'nizin ana dizinine yükleyin.');
             }, 'image/jpeg', 0.9);
         }
-        
+
         function generateDynamicUrl() {
             const text = encodeURIComponent(textInput.value || 'Merhaba Discord!');
             const fontSize = fontSizeInput.value;
             const color = encodeURIComponent(colorInput.value);
-            
+
             const baseUrl = window.location.origin + window.location.pathname.replace('create-static-image.html', '');
-            
+
             const urls = [
                 `${baseUrl}resim.png?text=${text}&size=${fontSize}&color=${color}`,
                 `${baseUrl}resim.jpg?text=${text}&size=${fontSize}&color=${color}`,
                 `${baseUrl}resim.html?text=${text}&size=${fontSize}&color=${color}`
             ];
-            
+
             currentUrl = urls[0]; // PNG URL'sini varsayılan yap
-            
+
             urlDisplay.innerHTML = `
                 <strong>Discord için URL'ler:</strong><br><br>
                 <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 5px;">
@@ -230,10 +245,10 @@
                     <code>${urls[2]}</code>
                 </div>
             `;
-            
+
             urlSection.style.display = 'block';
         }
-        
+
         function copyToClipboard() {
             if (currentUrl) {
                 navigator.clipboard.writeText(currentUrl).then(() => {
@@ -241,7 +256,7 @@
                 });
             }
         }
-        
+
         // Event listeners
         textInput.addEventListener('input', updatePreview);
         fontSizeInput.addEventListener('input', () => {
@@ -249,9 +264,10 @@
             updatePreview();
         });
         colorInput.addEventListener('input', updatePreview);
-        
+
         // İlk önizleme
         updatePreview();
     </script>
 </body>
+
 </html>
