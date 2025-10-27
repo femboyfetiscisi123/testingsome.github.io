@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Dinamik Resim</title>
+    
+    <!-- Discord için kritik meta tag'lar - Statik değerler -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Dinamik Resim">
+    <meta property="og:title" id="og-title" content="Dinamik Resim">
+    <meta property="og:description" id="og-description" content="Özel metin ile oluşturulmuş resim">
+    
+    <!-- Discord'un resim olarak algılaması için özel header -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Resim meta tag'ları - Discord için optimize -->
+    <meta property="og:image" id="og-image" content="">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="800">
+    <meta property="og:image:height" content="400">
+    <meta property="og:image:alt" id="og-image-alt" content="Dinamik oluşturulmuş resim">
+    <meta property="og:image:secure_url" id="og-image-secure" content="">
+    
+    <!-- Twitter Card - Discord tarafından da kullanılır -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="Dinamik Resim">
+    <meta name="twitter:description" id="twitter-description" content="Özel metin ile oluşturulmuş resim">
+    <meta name="twitter:image" id="twitter-image" content="">
+    <meta name="twitter:image:alt" id="twitter-image-alt" content="Dinamik oluşturulmuş resim">
+    
+    <!-- Discord özel optimizasyonlar -->
+    <meta name="theme-color" content="#667eea">
+    <meta property="og:url" id="og-url" content="">
+    <meta name="robots" content="index, follow, noimageindex">
+    <link rel="canonical" id="canonical" href="">
+    
+    <!-- Discord'un resim olarak algılaması için HTTP header simülasyonu -->
+    <meta http-equiv="Cache-Control" content="public, max-age=3600">
+    <meta http-equiv="Expires" content="">
+    
+    <!-- Resim dosyası gibi davranması için ek meta tag'lar -->
+    <meta name="referrer" content="no-referrer-when-downgrade">
+    <meta property="og:locale" content="tr_TR">
+    <style>
+        /* Discord embed için optimize edilmiş stil */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 800px;
+            height: 400px;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        
+        canvas {
+            display: block;
+            width: 800px;
+            height: 400px;
+            border: none;
+            outline: none;
+        }
+        
+        /* Discord bot'ları için gizli resim elementi */
+        .discord-image {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 800px;
+            height: 400px;
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Discord için ana canvas -->
+    <canvas id="canvas" width="800" height="400"></canvas>
+    
+    <!-- Discord bot'ları için gizli resim elementi (otomatik oluşturulacak) -->
+    
+    <script>
+        // URL parametrelerini al
+        const urlParams = new URLSearchParams(window.location.search);
+        const text = decodeURIComponent(urlParams.get('text') || 'Merhaba Dünya!');
+        const fontSize = parseInt(urlParams.get('size') || '40');
+        const color = decodeURIComponent(urlParams.get('color') || '#ffffff');
+        
+        // Canvas ve context
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function drawImage() {
+            // Canvas'ı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Gradient arka plan
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Metin ayarları
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            
+            // Metni çiz (çok satırlı destek)
+            const lines = text.split('\n');
+            const lineHeight = fontSize * 1.2;
+            const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
+            });
+        }
+        
+        function updateMetaTags() {
+            // Resmi PNG olarak al (maksimum kalite)
+            const imageDataUrl = canvas.toDataURL('image/png', 1.0);
+            const currentUrl = window.location.href;
+            const shortText = text.substring(0, 50) + (text.length > 50 ? '...' : '');
+            const description = `"${shortText}" metni ile oluşturulmuş dinamik resim`;
+            
+            // Title güncelle
+            document.title = shortText;
+            document.getElementById('page-title').textContent = shortText;
+            
+            // Open Graph meta tag'ları güncelle
+            document.getElementById('og-title').setAttribute('content', shortText);
+            document.getElementById('og-description').setAttribute('content', description);
+            document.getElementById('og-image').setAttribute('content', imageDataUrl);
+            document.getElementById('og-image-secure').setAttribute('content', imageDataUrl);
+            document.getElementById('og-image-alt').setAttribute('content', description);
+            document.getElementById('og-url').setAttribute('content', currentUrl);
+            
+            // Twitter meta tag'ları güncelle
+            document.getElementById('twitter-title').setAttribute('content', shortText);
+            document.getElementById('twitter-description').setAttribute('content', description);
+            document.getElementById('twitter-image').setAttribute('content', imageDataUrl);
+            document.getElementById('twitter-image-alt').setAttribute('content', description);
+            
+            // Canonical URL
+            document.getElementById('canonical').setAttribute('href', currentUrl);
+            
+            // Expires header simülasyonu
+            const expires = new Date();
+            expires.setHours(expires.getHours() + 1);
+            document.querySelector('meta[http-equiv="Expires"]').setAttribute('content', expires.toUTCString());
+            
+            // Favicon olarak da ayarla
+            let favicon = document.querySelector('link[rel="icon"]');
+            if (!favicon) {
+                favicon = document.createElement('link');
+                favicon.rel = 'icon';
+                document.head.appendChild(favicon);
+            }
+            favicon.href = imageDataUrl;
+            
+            // Discord için gizli resim elementi oluştur
+            createHiddenImageElement(imageDataUrl);
+            
+            // HTTP response header'ları simüle et
+            simulateImageHeaders();
+        }
+        
+        function createHiddenImageElement(dataUrl) {
+            // Mevcut gizli resmi kaldır
+            const existingImg = document.querySelector('.discord-image');
+            if (existingImg) {
+                existingImg.remove();
+            }
+            
+            // Yeni gizli resim elementi oluştur
+            const img = document.createElement('img');
+            img.className = 'discord-image';
+            img.src = dataUrl;
+            img.alt = text;
+            img.width = 800;
+            img.height = 400;
+            document.body.appendChild(img);
+        }
+        
+        function simulateImageHeaders() {
+            // Discord'un resim olarak algılaması için HTTP header simülasyonu
+            const head = document.head;
+            
+            // Content-Type meta tag'ı ekle
+            let contentType = document.querySelector('meta[http-equiv="Content-Type"]');
+            if (contentType) {
+                contentType.setAttribute('content', 'image/png');
+            }
+            
+            // Cache-Control optimizasyonu
+            let cacheControl = document.querySelector('meta[http-equiv="Cache-Control"]');
+            if (cacheControl) {
+                cacheControl.setAttribute('content', 'public, max-age=3600, immutable');
+            }
+        }
+        
+        // Discord embed optimizasyonu için özel başlatma
+        function initializeForDiscord() {
+            // Resmi çiz
+            drawImage();
+            
+            // Meta tag'ları hemen güncelle
+            updateMetaTags();
+            
+            // Discord bot'ları için ek optimizasyon
+            setTimeout(() => {
+                updateMetaTags();
+                
+                // Sayfa başlığını resim içeriğine göre ayarla
+                document.title = text || 'Dinamik Resim';
+                
+                // Body'yi resim gibi davranacak şekilde ayarla
+                document.body.style.background = 'transparent';
+                document.body.style.width = '800px';
+                document.body.style.height = '400px';
+                
+            }, 50);
+        }
+        
+        // Sayfa yüklendiğinde Discord optimizasyonunu başlat
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeForDiscord);
+        } else {
+            initializeForDiscord();
+        }
+        
+        // Sayfa tamamen yüklendiğinde de güncelle
+        window.addEventListener('load', () => {
+            setTimeout(updateMetaTags, 100);
+        });
+        
+        // Discord bot'ları için User-Agent kontrolü
+        const userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.includes('discord') || userAgent.includes('bot')) {
+            // Discord bot'u algılandı, özel optimizasyonlar
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            document.body.style.overflow = 'hidden';
+        }
+    </script>
+</body>
+</html>
