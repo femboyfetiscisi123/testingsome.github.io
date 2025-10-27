@@ -32,12 +32,52 @@
 
         input,
         textarea,
-        button {
+        button,
+        select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             box-sizing: border-box;
+        }
+        
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .image-item {
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        .image-item:hover {
+            border-color: #667eea;
+        }
+        
+        .image-item.selected {
+            border-color: #28a745;
+            background-color: #e8f5e8;
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+        
+        .image-item span {
+            display: block;
+            font-size: 12px;
+            margin-top: 5px;
+            word-break: break-all;
         }
 
         button {
@@ -86,20 +126,98 @@
         <h1>🎯 Discord Embed Resim Oluşturucu</h1>
         <p><strong>Bu araç Discord'da %100 çalışan embed resimleri oluşturur!</strong></p>
 
+        <!-- Arka Plan Resmi Seçimi -->
         <div class="form-group">
-            <label for="textInput">Metin:</label>
+            <label for="backgroundSelect">🖼️ Arka Plan Resmi:</label>
+            <select id="backgroundSelect">
+                <option value="">Gradient Arka Plan (Varsayılan)</option>
+                <option value="custom">Özel URL Gir</option>
+            </select>
+            <input type="text" id="customImageUrl" placeholder="Resim URL'si girin..." style="display: none; margin-top: 10px;">
+            <button type="button" onclick="loadGithubImages()" style="margin-top: 10px;">📂 GitHub Images/ Klasörünü Tara</button>
+            <div id="githubImages" style="display: none; margin-top: 10px;"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="textInput">📝 Metin:</label>
             <textarea id="textInput" placeholder="Discord'da gösterilecek metni yazın..."
                 rows="3">Merhaba Discord!</textarea>
         </div>
 
+        <!-- Font Ayarları -->
         <div class="form-group">
-            <label for="fontSizeInput">Font Boyutu: <span id="fontSizeValue">40px</span></label>
+            <label for="fontFamily">🔤 Font Ailesi:</label>
+            <select id="fontFamily">
+                <option value="Arial">Arial</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Impact">Impact</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Tahoma">Tahoma</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fontSizeInput">📏 Font Boyutu: <span id="fontSizeValue">40px</span></label>
             <input type="range" id="fontSizeInput" min="20" max="100" value="40">
         </div>
 
         <div class="form-group">
-            <label for="colorInput">Metin Rengi:</label>
+            <label for="fontWeight">💪 Font Kalınlığı:</label>
+            <select id="fontWeight">
+                <option value="normal">Normal</option>
+                <option value="bold" selected>Kalın</option>
+                <option value="bolder">Çok Kalın</option>
+                <option value="lighter">İnce</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="colorInput">🎨 Metin Rengi:</label>
             <input type="color" id="colorInput" value="#ffffff">
+        </div>
+
+        <!-- Metin Pozisyonu -->
+        <div class="form-group">
+            <label>📍 Metin Pozisyonu:</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label for="textX">Yatay (X): <span id="textXValue">400px</span></label>
+                    <input type="range" id="textX" min="0" max="800" value="400">
+                </div>
+                <div>
+                    <label for="textY">Dikey (Y): <span id="textYValue">200px</span></label>
+                    <input type="range" id="textY" min="0" max="400" value="200">
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <button type="button" onclick="setTextPosition('center')">🎯 Ortala</button>
+                <button type="button" onclick="setTextPosition('top')">⬆️ Üst</button>
+                <button type="button" onclick="setTextPosition('bottom')">⬇️ Alt</button>
+            </div>
+        </div>
+
+        <!-- Metin Efektleri -->
+        <div class="form-group">
+            <label>✨ Metin Efektleri:</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label for="shadowBlur">Gölge Bulanıklığı: <span id="shadowBlurValue">4px</span></label>
+                    <input type="range" id="shadowBlur" min="0" max="20" value="4">
+                </div>
+                <div>
+                    <label for="shadowOffset">Gölge Mesafesi: <span id="shadowOffsetValue">2px</span></label>
+                    <input type="range" id="shadowOffset" min="0" max="10" value="2">
+                </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <label for="shadowColor">Gölge Rengi:</label>
+                <input type="color" id="shadowColor" value="#000000">
+            </div>
         </div>
 
         <div class="preview">
@@ -145,42 +263,199 @@
         const colorInput = document.getElementById('colorInput');
         const urlSection = document.getElementById('urlSection');
         const urlDisplay = document.getElementById('urlDisplay');
+        
+        // Yeni elementler
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const customImageUrl = document.getElementById('customImageUrl');
+        const fontFamily = document.getElementById('fontFamily');
+        const fontWeight = document.getElementById('fontWeight');
+        const textX = document.getElementById('textX');
+        const textY = document.getElementById('textY');
+        const textXValue = document.getElementById('textXValue');
+        const textYValue = document.getElementById('textYValue');
+        const shadowBlur = document.getElementById('shadowBlur');
+        const shadowOffset = document.getElementById('shadowOffset');
+        const shadowBlurValue = document.getElementById('shadowBlurValue');
+        const shadowOffsetValue = document.getElementById('shadowOffsetValue');
+        const shadowColor = document.getElementById('shadowColor');
+        const githubImages = document.getElementById('githubImages');
 
         let currentUrl = '';
+        let backgroundImage = null;
+        let selectedImageUrl = '';
 
         function updatePreview() {
             const text = textInput.value || 'Merhaba Discord!';
             const fontSize = parseInt(fontSizeInput.value);
             const color = colorInput.value;
+            const font = fontFamily.value;
+            const weight = fontWeight.value;
+            const posX = parseInt(textX.value);
+            const posY = parseInt(textY.value);
+            const blur = parseInt(shadowBlur.value);
+            const offset = parseInt(shadowOffset.value);
+            const sColor = shadowColor.value;
 
             // Canvas'ı temizle
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Gradient arka plan
-            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            gradient.addColorStop(0, '#667eea');
-            gradient.addColorStop(1, '#764ba2');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Arka plan çiz
+            if (backgroundImage) {
+                // Resim arka planı
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+                
+                // Yarı şeffaf overlay (metin okunabilirliği için)
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                // Gradient arka plan
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
 
             // Metin ayarları
-            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.font = `${weight} ${fontSize}px ${font}`;
             ctx.fillStyle = color;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
+            
+            // Gölge ayarları
+            ctx.shadowColor = sColor;
+            ctx.shadowBlur = blur;
+            ctx.shadowOffsetX = offset;
+            ctx.shadowOffsetY = offset;
 
             // Metni çiz
             const lines = text.split('\n');
             const lineHeight = fontSize * 1.2;
-            const startY = canvas.height / 2 - ((lines.length - 1) * lineHeight) / 2;
+            const startY = posY - ((lines.length - 1) * lineHeight) / 2;
 
             lines.forEach((line, index) => {
-                ctx.fillText(line, canvas.width / 2, startY + (index * lineHeight));
+                ctx.fillText(line, posX, startY + (index * lineHeight));
             });
+        }
+        
+        function setTextPosition(position) {
+            switch(position) {
+                case 'center':
+                    textX.value = 400;
+                    textY.value = 200;
+                    break;
+                case 'top':
+                    textX.value = 400;
+                    textY.value = 100;
+                    break;
+                case 'bottom':
+                    textX.value = 400;
+                    textY.value = 300;
+                    break;
+            }
+            updatePositionValues();
+            updatePreview();
+        }
+        
+        function updatePositionValues() {
+            textXValue.textContent = textX.value + 'px';
+            textYValue.textContent = textY.value + 'px';
+        }
+        
+        function updateEffectValues() {
+            shadowBlurValue.textContent = shadowBlur.value + 'px';
+            shadowOffsetValue.textContent = shadowOffset.value + 'px';
+        }
+        
+        async function loadGithubImages() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('create-static-image.html', '');
+            
+            // GitHub API kullanarak images klasörünü tara
+            const repoPath = window.location.pathname.split('/').slice(1, -1).join('/');
+            const apiUrl = `https://api.github.com/repos/${repoPath}/contents/images`;
+            
+            try {
+                githubImages.innerHTML = '<p>🔄 GitHub images/ klasörü taranıyor...</p>';
+                githubImages.style.display = 'block';
+                
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('GitHub API hatası');
+                }
+                
+                const files = await response.json();
+                const imageFiles = files.filter(file => 
+                    file.type === 'file' && 
+                    /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+                );
+                
+                if (imageFiles.length === 0) {
+                    githubImages.innerHTML = '<p>📁 images/ klasöründe resim bulunamadı.</p>';
+                    return;
+                }
+                
+                let imagesHtml = '<h4>📂 GitHub Images/ Klasöründeki Resimler:</h4><div class="image-grid">';
+                
+                imageFiles.forEach(file => {
+                    const imageUrl = `${baseUrl}images/${file.name}`;
+                    imagesHtml += `
+                        <div class="image-item" onclick="selectGithubImage('${imageUrl}', '${file.name}')">
+                            <img src="${imageUrl}" alt="${file.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2RkZCIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Resim</text></svg>'">
+                            <span>${file.name}</span>
+                        </div>
+                    `;
+                });
+                
+                imagesHtml += '</div>';
+                githubImages.innerHTML = imagesHtml;
+                
+            } catch (error) {
+                console.error('GitHub images yüklenirken hata:', error);
+                githubImages.innerHTML = `
+                    <p>❌ GitHub images/ klasörü yüklenemedi.</p>
+                    <p><small>Alternatif: "Özel URL Gir" seçeneğini kullanın.</small></p>
+                `;
+            }
+        }
+        
+        function selectGithubImage(imageUrl, fileName) {
+            // Önceki seçimi kaldır
+            document.querySelectorAll('.image-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Yeni seçimi işaretle
+            event.currentTarget.classList.add('selected');
+            
+            // Resmi yükle
+            loadBackgroundImage(imageUrl);
+            selectedImageUrl = imageUrl;
+            
+            // Select'i güncelle
+            backgroundSelect.value = 'custom';
+            customImageUrl.value = imageUrl;
+            customImageUrl.style.display = 'block';
+        }
+        
+        function loadBackgroundImage(url) {
+            if (!url) {
+                backgroundImage = null;
+                updatePreview();
+                return;
+            }
+            
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                backgroundImage = img;
+                updatePreview();
+            };
+            img.onerror = function() {
+                alert('❌ Resim yüklenemedi: ' + url);
+                backgroundImage = null;
+                updatePreview();
+            };
+            img.src = url;
         }
 
         function downloadAsResimPng() {
@@ -265,13 +540,61 @@
 
         // Event listeners
         textInput.addEventListener('input', updatePreview);
+        
         fontSizeInput.addEventListener('input', () => {
             fontSizeValue.textContent = fontSizeInput.value + 'px';
             updatePreview();
         });
+        
         colorInput.addEventListener('input', updatePreview);
+        fontFamily.addEventListener('change', updatePreview);
+        fontWeight.addEventListener('change', updatePreview);
+        
+        textX.addEventListener('input', () => {
+            updatePositionValues();
+            updatePreview();
+        });
+        
+        textY.addEventListener('input', () => {
+            updatePositionValues();
+            updatePreview();
+        });
+        
+        shadowBlur.addEventListener('input', () => {
+            updateEffectValues();
+            updatePreview();
+        });
+        
+        shadowOffset.addEventListener('input', () => {
+            updateEffectValues();
+            updatePreview();
+        });
+        
+        shadowColor.addEventListener('input', updatePreview);
+        
+        backgroundSelect.addEventListener('change', () => {
+            if (backgroundSelect.value === 'custom') {
+                customImageUrl.style.display = 'block';
+            } else {
+                customImageUrl.style.display = 'none';
+                backgroundImage = null;
+                updatePreview();
+            }
+        });
+        
+        customImageUrl.addEventListener('input', () => {
+            const url = customImageUrl.value.trim();
+            if (url) {
+                loadBackgroundImage(url);
+            } else {
+                backgroundImage = null;
+                updatePreview();
+            }
+        });
 
-        // İlk önizleme
+        // İlk değerleri ayarla
+        updatePositionValues();
+        updateEffectValues();
         updatePreview();
     </script>
 </body>
