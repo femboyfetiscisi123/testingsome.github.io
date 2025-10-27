@@ -86,15 +86,15 @@ function initSimpleMeme() {
         const color = encodeURIComponent(colorInput.value);
 
         const baseUrl = window.location.origin + window.location.pathname.replace('index.html', '');
-        
+
         // Temel parametreler
         const baseParams = `text=${text}&size=${fontSize}&color=${color}`;
-        
+
         // Sadece PNG URL'ini göster
         const pngUrl = `${baseUrl}resim.png?${baseParams}`;
-        
+
         generatedUrl.innerHTML = `
-            <strong>Discord için URL:</strong><br>
+            <strong>Görsel URL:</strong><br>
             <div style="margin: 5px 0; padding: 5px; background: white; border-radius: 3px;">
                 <strong>Görsel URL:</strong> ${pngUrl}
             </div>
@@ -113,7 +113,7 @@ function initAdvancedMeme() {
     // DOM Elements
     const canvas = document.getElementById('canvas');
     if (!canvas) return; // Bu sayfa için değil
-    
+
     const ctx = canvas.getContext('2d');
     const fontSizeInput = document.getElementById('fontSizeInput');
     const fontSizeValue = document.getElementById('fontSizeValue');
@@ -190,7 +190,7 @@ function initAdvancedMeme() {
     }
 
     // Add new text box
-    window.addTextBox = function(defaultText = '', defaultX = 400, defaultY = 200) {
+    window.addTextBox = function (defaultText = '', defaultX = 400, defaultY = 200) {
         const id = textBoxCounter++;
         const textBox = {
             id: id,
@@ -214,7 +214,7 @@ function initAdvancedMeme() {
     }
 
     // Remove text box
-    window.removeTextBox = function(id) {
+    window.removeTextBox = function (id) {
         if (textBoxes.length <= 1) {
             alert('En az bir metin kutusu olmalı!');
             return;
@@ -242,7 +242,7 @@ function initAdvancedMeme() {
     }
 
     // Set active text box
-    window.setActiveTextBox = function(id) {
+    window.setActiveTextBox = function (id) {
         updateActiveBoxFromControls();
         activeTextBoxId = id;
         renderTextBoxes();
@@ -333,7 +333,7 @@ function initAdvancedMeme() {
     }
 
     // Update text box text
-    window.updateTextBoxText = function(id, text) {
+    window.updateTextBoxText = function (id, text) {
         const box = textBoxes.find(box => box.id === id);
         if (box) {
             box.text = text;
@@ -342,7 +342,7 @@ function initAdvancedMeme() {
     }
 
     // Toggle text box visibility
-    window.toggleTextBoxVisibility = function(id) {
+    window.toggleTextBoxVisibility = function (id) {
         const box = textBoxes.find(box => box.id === id);
         if (box) {
             box.visible = !box.visible;
@@ -419,7 +419,7 @@ function initAdvancedMeme() {
     }
 
     // Toggle meme dropdown
-    window.toggleMemeDropdown = function() {
+    window.toggleMemeDropdown = function () {
         memeDropdown.classList.toggle('show');
         if (memeDropdown.classList.contains('show') && memeTemplates.length === 0) {
             memeDropdown.innerHTML = '<div class="loading">🔄 Imgflip\'ten popüler meme\'ler yükleniyor...</div>';
@@ -427,7 +427,7 @@ function initAdvancedMeme() {
     }
 
     // Toggle GitHub dropdown
-    window.toggleGithubDropdown = function() {
+    window.toggleGithubDropdown = function () {
         githubDropdown.classList.toggle('show');
         if (githubDropdown.classList.contains('show')) {
             loadGithubImages();
@@ -570,7 +570,7 @@ function initAdvancedMeme() {
     }
 
     // Select meme template
-    window.selectMeme = function(memeId) {
+    window.selectMeme = function (memeId) {
         if (!memeId) {
             selectedMeme = null;
             backgroundImage = null;
@@ -588,7 +588,7 @@ function initAdvancedMeme() {
     }
 
     // Select GitHub image
-    window.selectGithubImage = function(imageUrl, imageName) {
+    window.selectGithubImage = function (imageUrl, imageName) {
         selectedMeme = null;
         githubImageSearch.value = imageName;
         loadBackgroundImage(imageUrl);
@@ -600,11 +600,11 @@ function initAdvancedMeme() {
     function loadBackgroundImage(url) {
         const img = new Image();
         img.crossOrigin = 'anonymous';
-        img.onload = function() {
+        img.onload = function () {
             backgroundImage = img;
             updatePreview();
         };
-        img.onerror = function() {
+        img.onerror = function () {
             alert('❌ Resim yüklenemedi: ' + url);
             backgroundImage = null;
             updatePreview();
@@ -613,17 +613,17 @@ function initAdvancedMeme() {
     }
 
     // Set color from palette
-    window.setColor = function(color) {
+    window.setColor = function (color) {
         colorInput.value = color;
         updatePreview();
     }
 
     // Set text position
-    window.setTextPosition = function(position) {
+    window.setTextPosition = function (position) {
         const activeBox = textBoxes.find(box => box.id === activeTextBoxId);
         if (!activeBox) return;
 
-        switch(position) {
+        switch (position) {
             case 'top':
                 activeBox.y = 100;
                 break;
@@ -769,7 +769,7 @@ function initAdvancedMeme() {
     }
 
     // Download image as PNG
-    window.downloadImage = function() {
+    window.downloadImage = function () {
         updatePreview();
         canvas.toBlob((blob) => {
             const url = URL.createObjectURL(blob);
@@ -785,23 +785,23 @@ function initAdvancedMeme() {
     }
 
     // Copy URL to clipboard
-    window.copyUrlToClipboard = async function() {
+    window.copyUrlToClipboard = async function () {
         try {
             const pngUrl = document.getElementById('pngUrl').textContent;
             if (pngUrl && pngUrl !== 'URL oluşturuluyor...') {
                 await navigator.clipboard.writeText(pngUrl);
-                
+
                 const button = event.target;
                 const originalText = button.innerHTML;
                 button.innerHTML = '✅ Kopyalandı!';
                 button.style.background = '#28a745';
-                
+
                 setTimeout(() => {
                     button.innerHTML = originalText;
                     button.style.background = '';
                 }, 2000);
-                
-                showNotification('✅ Discord URL kopyalandı!', 'success');
+
+                showNotification('✅ URL kopyalandı!', 'success');
             } else {
                 alert('Henüz kopyalanacak URL yok. Lütfen bir görsel oluşturun.');
             }
@@ -823,7 +823,7 @@ function initAdvancedMeme() {
         const notification = document.createElement('div');
         notification.className = 'notification';
         notification.textContent = message;
-        
+
         const colors = {
             success: '#28a745',
             error: '#dc3545',

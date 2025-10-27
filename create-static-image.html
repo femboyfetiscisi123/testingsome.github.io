@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 Meme & Discord Embed Oluşturucu</title>
+    <title>🎨 Meme Oluşturucu</title>
     <style>
         * {
             margin: 0;
@@ -414,8 +414,8 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="app-header">
-                <h1 class="app-title">🎨 Meme & Discord Embed Oluşturucu</h1>
-                <p class="app-subtitle">Profesyonel meme'ler ve Discord embed'leri oluşturun</p>
+                <h1 class="app-title">🎨 Meme Oluşturucu</h1>
+                <p class="app-subtitle">Profesyonel meme'ler oluşturun ve paylaşın</p>
             </div>
 
             <!-- Template Seçimi -->
@@ -576,14 +576,10 @@
 
             <!-- Live URL Display -->
             <div class="url-result show" id="liveUrlResult">
-                <h3 style="margin-bottom: 15px;">🔗 Canlı Discord Embed URL'i</h3>
-                <div id="liveUrlDisplay">
-                    <div style="margin: 5px 0; padding: 8px; background: white; border-radius: 6px; font-size: 12px;">
-                        <strong>Görsel URL:</strong> <span id="pngUrl">URL oluşturuluyor...</span>
-                    </div>
-                </div>
-                <div style="margin-top: 10px; padding: 8px; background: #e3f2fd; border-radius: 6px; font-size: 12px;">
-                    💡 <strong>İpucu:</strong> URL otomatik olarak güncellenir. Discord'da paylaşmak için kopyalayın!
+                <div
+                    style="display: flex; align-items: center; gap: 10px; padding: 10px; background: white; border-radius: 8px; font-size: 11px;">
+                    <span style="color: #666; font-weight: 500;">🔗 URL:</span>
+                    <span id="pngUrl" style="flex: 1; color: #333; word-break: break-all;">URL oluşturuluyor...</span>
                 </div>
             </div>
         </div>
