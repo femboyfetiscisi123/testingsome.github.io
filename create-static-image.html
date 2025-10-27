@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Meme & Discord Embed Oluşturucu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .app-subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-range {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #e1e5e9;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .form-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-value {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #495057;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .canvas {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .meme-selector {
+            position: relative;
+        }
+
+        .meme-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .meme-dropdown.show {
+            display: block;
+        }
+
+        .meme-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .meme-option:hover {
+            background: #f8f9fa;
+        }
+
+        .meme-option:last-child {
+            border-bottom: none;
+        }
+
+        .meme-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .meme-info {
+            flex: 1;
+        }
+
+        .meme-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .meme-id {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+
+        .url-result {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .url-result.show {
+            display: block;
+        }
+
+        .text-box {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .text-box.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .text-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .text-box-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .text-box-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-mini {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-mini.btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-mini.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-mini:hover {
+            transform: scale(1.05);
+        }
+
+        .text-box-content {
+            display: grid;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .position-preview {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+                min-height: 500px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="app-header">
+                <h1 class="app-title">🎨 Meme & Discord Embed Oluşturucu</h1>
+                <p class="app-subtitle">Profesyonel meme'ler ve Discord embed'leri oluşturun</p>
+            </div>
+
+            <!-- Meme Template Seçimi -->
+            <div class="section">
+                <h3 class="section-title">🖼️ Template Seçimi</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Meme Template'i</label>
+                    <div class="meme-selector">
+                        <input type="text" class="form-input" id="memeSearch" placeholder="Meme template ara..."
+                            readonly onclick="toggleMemeDropdown()">
+                        <div class="meme-dropdown" id="memeDropdown">
+                            <div class="loading" id="memeLoading">🔄 Popüler meme'ler yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Özel Resim URL</label>
+                    <input type="text" class="form-input" id="customImageUrl"
+                        placeholder="Kendi resim URL'nizi girin...">
+                </div>
+
+                <button class="btn btn-secondary" onclick="loadGithubImages()" style="width: 100%;">
+                    📂 GitHub Images/ Klasörü
+                </button>
+            </div>
+
+            <!-- Metin Ayarları -->
+            <div class="section">
+                <h3 class="section-title">📝 Metin Ayarları</h3>
+
+                <div class="form-group">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label class="form-label" style="margin: 0;">Metin Kutuları</label>
+                        <button class="btn btn-secondary btn-small" onclick="addTextBox()" style="padding: 6px 12px;">
+                            ➕ Metin Ekle
+                        </button>
+                    </div>
+                    <div id="textBoxes">
+                        <!-- Metin kutuları buraya dinamik olarak eklenecek -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Font Ailesi</label>
+                    <select class="form-select" id="fontFamily">
+                        <option value="Impact">Impact (Meme Klasiği)</option>
+                        <option value="Arial Black">Arial Black</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Helvetica">Helvetica</option>
+                        <option value="Comic Sans MS">Comic Sans MS</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Font Boyutu: <span class="range-value"
+                            id="fontSizeValue">40px</span></label>
+                    <input type="range" class="form-range" id="fontSizeInput" min="20" max="100" value="40">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Font Kalınlığı</label>
+                    <select class="form-select" id="fontWeight">
+                        <option value="900">Çok Kalın (Meme Stili)</option>
+                        <option value="bold">Kalın</option>
+                        <option value="normal">Normal</option>
+                        <option value="lighter">İnce</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Renk Ayarları -->
+            <div class="section">
+                <h3 class="section-title">🎨 Renk & Efekt</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Metin Rengi</label>
+                    <input type="color" class="form-input" id="colorInput" value="#ffffff">
+                    <div class="color-palette">
+                        <div class="color-swatch" style="background: #ffffff" onclick="setColor('#ffffff')"></div>
+                        <div class="color-swatch" style="background: #000000" onclick="setColor('#000000')"></div>
+                        <div class="color-swatch" style="background: #ff0000" onclick="setColor('#ff0000')"></div>
+                        <div class="color-swatch" style="background: #00ff00" onclick="setColor('#00ff00')"></div>
+                        <div class="color-swatch" style="background: #0000ff" onclick="setColor('#0000ff')"></div>
+                        <div class="color-swatch" style="background: #ffff00" onclick="setColor('#ffff00')"></div>
+                        <div class="color-swatch" style="background: #ff00ff" onclick="setColor('#ff00ff')"></div>
+                        <div class="color-swatch" style="background: #00ffff" onclick="setColor('#00ffff')"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gölge Bulanıklığı: <span class="range-value"
+                            id="shadowBlurValue">4px</span></label>
+                    <input type="range" class="form-range" id="shadowBlur" min="0" max="20" value="4">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gölge Mesafesi: <span class="range-value"
+                            id="shadowOffsetValue">2px</span></label>
+                    <input type="range" class="form-range" id="shadowOffset" min="0" max="10" value="2">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gölge Rengi</label>
+                    <input type="color" class="form-input" id="shadowColor" value="#000000">
+                </div>
+            </div>
+
+            <!-- Pozisyon Ayarları -->
+            <div class="section">
+                <h3 class="section-title">📍 Pozisyon</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Yatay (X): <span class="range-value" id="textXValue">400px</span></label>
+                    <input type="range" class="form-range" id="textX" min="0" max="800" value="400">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Dikey (Y): <span class="range-value" id="textYValue">200px</span></label>
+                    <input type="range" class="form-range" id="textY" min="0" max="400" value="200">
+                </div>
+
+                <div class="btn-grid">
+                    <button class="btn btn-secondary btn-small" onclick="setTextPosition('top')">⬆️ Üst</button>
+                    <button class="btn btn-secondary btn-small" onclick="setTextPosition('center')">🎯 Orta</button>
+                    <button class="btn btn-secondary btn-small" onclick="setTextPosition('bottom')">⬇️ Alt</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Canvas Area -->
+            <div class="canvas-container">
+                <canvas id="canvas" class="canvas" width="800" height="400"></canvas>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="downloadAsResimPng()">
+                    📥 PNG İndir
+                </button>
+                <button class="btn btn-primary" onclick="downloadAsResimJpg()">
+                    📷 JPG İndir
+                </button>
+                <button class="btn btn-primary" onclick="generateDynamicUrl()">
+                    🔗 Discord URL Oluştur
+                </button>
+            </div>
+
+            <!-- URL Results -->
+            <div class="url-result" id="urlResult">
+                <h3 style="margin-bottom: 15px;">🔗 Discord Embed URL'leri</h3>
+                <div id="urlDisplay"></div>
+                <button class="btn btn-primary" onclick="copyToClipboard()" style="margin-top: 15px;">
+                    📋 En İyi URL'yi Kopyala
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const textInput = document.getElementById('textInput');
+        const fontSizeInput = document.getElementById('fontSizeInput');
+        const fontSizeValue = document.getElementById('fontSizeValue');
+        const colorInput = document.getElementById('colorInput');
+        const customImageUrl = document.getElementById('customImageUrl');
+        const fontFamily = document.getElementById('fontFamily');
+        const fontWeight = document.getElementById('fontWeight');
+        const textX = document.getElementById('textX');
+        const textY = document.getElementById('textY');
+        const textXValue = document.getElementById('textXValue');
+        const textYValue = document.getElementById('textYValue');
+        const shadowBlur = document.getElementById('shadowBlur');
+        const shadowOffset = document.getElementById('shadowOffset');
+        const shadowBlurValue = document.getElementById('shadowBlurValue');
+        const shadowOffsetValue = document.getElementById('shadowOffsetValue');
+        const shadowColor = document.getElementById('shadowColor');
+        const memeSearch = document.getElementById('memeSearch');
+        const memeDropdown = document.getElementById('memeDropdown');
+        const memeLoading = document.getElementById('memeLoading');
+        const urlResult = document.getElementById('urlResult');
+        const urlDisplay = document.getElementById('urlDisplay');
+
+        // State
+        let currentUrl = '';
+        let backgroundImage = null;
+        let selectedImageUrl = '';
+        let memeTemplates = [];
+        let selectedMeme = null;
+        let textBoxes = [];
+        let activeTextBoxId = 0;
+        let textBoxCounter = 0;
+
+        // Popüler meme template'leri (imgflip.com'dan)
+        const popularMemes = [
+            { id: '181913649', name: 'Drake Pointing', url: 'https://i.imgflip.com/30b1gx.jpg' },
+            { id: '87743020', name: 'Two Buttons', url: 'https://i.imgflip.com/1g8my4.jpg' },
+            { id: '112126428', name: 'Distracted Boyfriend', url: 'https://i.imgflip.com/1ur9b0.jpg' },
+            { id: '131087935', name: 'Running Away Balloon', url: 'https://i.imgflip.com/261o3j.jpg' },
+            { id: '4087833', name: 'Waiting Skeleton', url: 'https://i.imgflip.com/2fm6x.jpg' },
+            { id: '61579', name: 'One Does Not Simply', url: 'https://i.imgflip.com/1bij.jpg' },
+            { id: '101470', name: 'Ancient Aliens', url: 'https://i.imgflip.com/26am.jpg' },
+            { id: '80707627', name: 'Sad Pablo Escobar', url: 'https://i.imgflip.com/1c1uej.jpg' },
+            { id: '178591752', name: 'Tuxedo Winnie The Pooh', url: 'https://i.imgflip.com/2ybua0.jpg' },
+            { id: '27813981', name: 'Hide the Pain Harold', url: 'https://i.imgflip.com/gk5el.jpg' },
+            { id: '124822590', name: 'Left Exit 12 Off Ramp', url: 'https://i.imgflip.com/22bdq6.jpg' },
+            { id: '129242436', name: 'Change My Mind', url: 'https://i.imgflip.com/24y43o.jpg' },
+            { id: '222403160', name: 'Bernie I Am Once Again Asking For Your Support', url: 'https://i.imgflip.com/3oevdk.jpg' },
+            { id: '91538330', name: 'X, X Everywhere', url: 'https://i.imgflip.com/1ihzfe.jpg' },
+            { id: '102156234', name: 'Mocking Spongebob', url: 'https://i.imgflip.com/1otk96.jpg' },
+            { id: '93895088', name: 'Expanding Brain', url: 'https://i.imgflip.com/1jwhww.jpg' },
+            { id: '135256802', name: 'Epic Handshake', url: 'https://i.imgflip.com/28j0te.jpg' },
+            { id: '114585149', name: 'Inhaling Seagull', url: 'https://i.imgflip.com/1w7ygt.jpg' },
+            { id: '161865971', name: 'Marked Safe From', url: 'https://i.imgflip.com/2odckz.jpg' },
+            { id: '97984', name: 'Disaster Girl', url: 'https://i.imgflip.com/23ls.jpg' }
+        ];
+
+        // Initialize
+        function init() {
+            loadMemeTemplates();
+            initializeTextBoxes();
+            updatePositionValues();
+            updateEffectValues();
+            updatePreview();
+        }
+
+        // Initialize text boxes
+        function initializeTextBoxes() {
+            // İlk metin kutusunu ekle
+            addTextBox('Üst Metin', 400, 100);
+            addTextBox('Alt Metin', 400, 300);
+        }
+
+        // Add new text box
+        function addTextBox(defaultText = '', defaultX = 400, defaultY = 200) {
+            const id = textBoxCounter++;
+            const textBox = {
+                id: id,
+                text: defaultText || `Metin ${id + 1}`,
+                x: defaultX,
+                y: defaultY,
+                fontSize: 40,
+                color: '#ffffff',
+                font: 'Impact',
+                weight: '900',
+                shadowBlur: 4,
+                shadowOffset: 2,
+                shadowColor: '#000000',
+                visible: true
+            };
+
+            textBoxes.push(textBox);
+            renderTextBoxes();
+            setActiveTextBox(id);
+            updatePreview();
+        }
+
+        // Remove text box
+        function removeTextBox(id) {
+            if (textBoxes.length <= 1) {
+                alert('En az bir metin kutusu olmalı!');
+                return;
+            }
+
+            textBoxes = textBoxes.filter(box => box.id !== id);
+
+            // Aktif kutu silinmişse, ilk kutuyu aktif yap
+            if (activeTextBoxId === id) {
+                activeTextBoxId = textBoxes[0]?.id || 0;
+            }
+
+            renderTextBoxes();
+            updatePreview();
+        }
+
+        // Set active text box
+        function setActiveTextBox(id) {
+            activeTextBoxId = id;
+            renderTextBoxes();
+            updateControlsFromActiveBox();
+        }
+
+        // Update controls from active text box
+        function updateControlsFromActiveBox() {
+            const activeBox = textBoxes.find(box => box.id === activeTextBoxId);
+            if (!activeBox) return;
+
+            // Ana kontrolleri güncelle
+            fontSizeInput.value = activeBox.fontSize;
+            fontSizeValue.textContent = activeBox.fontSize + 'px';
+            colorInput.value = activeBox.color;
+            fontFamily.value = activeBox.font;
+            fontWeight.value = activeBox.weight;
+            textX.value = activeBox.x;
+            textY.value = activeBox.y;
+            textXValue.textContent = activeBox.x + 'px';
+            textYValue.textContent = activeBox.y + 'px';
+            shadowBlur.value = activeBox.shadowBlur;
+            shadowOffset.value = activeBox.shadowOffset;
+            shadowBlurValue.textContent = activeBox.shadowBlur + 'px';
+            shadowOffsetValue.textContent = activeBox.shadowOffset + 'px';
+            shadowColor.value = activeBox.shadowColor;
+        }
+
+        // Update active text box from controls
+        function updateActiveBoxFromControls() {
+            const activeBox = textBoxes.find(box => box.id === activeTextBoxId);
+            if (!activeBox) return;
+
+            activeBox.fontSize = parseInt(fontSizeInput.value);
+            activeBox.color = colorInput.value;
+            activeBox.font = fontFamily.value;
+            activeBox.weight = fontWeight.value;
+            activeBox.x = parseInt(textX.value);
+            activeBox.y = parseInt(textY.value);
+            activeBox.shadowBlur = parseInt(shadowBlur.value);
+            activeBox.shadowOffset = parseInt(shadowOffset.value);
+            activeBox.shadowColor = shadowColor.value;
+        }
+
+        // Render text boxes
+        function renderTextBoxes() {
+            const container = document.getElementById('textBoxes');
+            container.innerHTML = '';
+
+            textBoxes.forEach((box, index) => {
+                const isActive = box.id === activeTextBoxId;
+                const boxHtml = `
+                    <div class="text-box ${isActive ? 'active' : ''}" onclick="setActiveTextBox(${box.id})">
+                        <div class="position-preview">X:${box.x} Y:${box.y}</div>
+                        <div class="text-box-header">
+                            <div class="text-box-title">📝 Metin ${index + 1}</div>
+                            <div class="text-box-controls">
+                                <button class="btn-mini btn-info" onclick="event.stopPropagation(); toggleTextBoxVisibility(${box.id})" title="Görünürlük">
+                                    ${box.visible ? '👁️' : '🙈'}
+                                </button>
+                                <button class="btn-mini btn-danger" onclick="event.stopPropagation(); removeTextBox(${box.id})" title="Sil">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-box-content">
+                            <textarea 
+                                class="form-textarea" 
+                                rows="2" 
+                                placeholder="Metin içeriği..."
+                                onchange="updateTextBoxText(${box.id}, this.value)"
+                                onclick="event.stopPropagation()"
+                            >${box.text}</textarea>
+                            <div class="form-row">
+                                <div>
+                                    <label class="form-label" style="font-size: 11px;">Font: ${box.font}</label>
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size: 11px;">Boyut: ${box.fontSize}px</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += boxHtml;
+            });
+        }
+
+        // Update text box text
+        function updateTextBoxText(id, text) {
+            const box = textBoxes.find(box => box.id === id);
+            if (box) {
+                box.text = text;
+                updatePreview();
+            }
+        }
+
+        // Toggle text box visibility
+        function toggleTextBoxVisibility(id) {
+            const box = textBoxes.find(box => box.id === id);
+            if (box) {
+                box.visible = !box.visible;
+                renderTextBoxes();
+                updatePreview();
+            }
+        }
+
+        // Load meme templates
+        function loadMemeTemplates() {
+            memeTemplates = popularMemes;
+            renderMemeDropdown();
+        }
+
+        // Render meme dropdown
+        function renderMemeDropdown() {
+            let html = '';
+
+            // Gradient seçeneği
+            html += `
+                <div class="meme-option" onclick="selectMeme(null)">
+                    <div class="meme-thumb" style="background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px;"></div>
+                    <div class="meme-info">
+                        <div class="meme-name">Gradient Arka Plan</div>
+                        <div class="meme-id">Varsayılan</div>
+                    </div>
+                </div>
+            `;
+
+            memeTemplates.forEach(meme => {
+                html += `
+                    <div class="meme-option" onclick="selectMeme('${meme.id}')">
+                        <img class="meme-thumb" src="${meme.url}" alt="${meme.name}" loading="lazy">
+                        <div class="meme-info">
+                            <div class="meme-name">${meme.name}</div>
+                            <div class="meme-id">ID: ${meme.id}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            memeDropdown.innerHTML = html;
+        }
+
+        // Toggle meme dropdown
+        function toggleMemeDropdown() {
+            memeDropdown.classList.toggle('show');
+        }
+
+        // Select meme template
+        function selectMeme(memeId) {
+            if (!memeId) {
+                // Gradient seçildi
+                selectedMeme = null;
+                backgroundImage = null;
+                memeSearch.value = 'Gradient Arka Plan';
+            } else {
+                const meme = memeTemplates.find(m => m.id === memeId);
+                if (meme) {
+                    selectedMeme = meme;
+                    memeSearch.value = meme.name;
+                    loadBackgroundImage(meme.url);
+                }
+            }
+
+            memeDropdown.classList.remove('show');
+            updatePreview();
+        }
+
+        // Set color from palette
+        function setColor(color) {
+            colorInput.value = color;
+            updatePreview();
+        }
+
+        // Update preview
+        function updatePreview() {
+            // Aktif kutudan kontrolleri güncelle
+            updateActiveBoxFromControls();
+
+            // Canvas'ı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Arka plan çiz
+            if (backgroundImage) {
+                // Resim arka planı
+                ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+            } else {
+                // Gradient arka plan
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Tüm görünür metin kutularını çiz
+            textBoxes.forEach(box => {
+                if (!box.visible || !box.text.trim()) return;
+
+                const text = box.text;
+                const fontSize = box.fontSize;
+                const color = box.color;
+                const font = box.font;
+                const weight = box.weight;
+                const posX = box.x;
+                const posY = box.y;
+                const blur = box.shadowBlur;
+                const offset = box.shadowOffset;
+                const sColor = box.shadowColor;
+
+                // Meme stili metin (beyaz metin + siyah kontur)
+                if (font === 'Impact' || font === 'Arial Black') {
+                    // Kontur çiz
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = Math.max(2, fontSize / 15);
+                    ctx.font = `${weight} ${fontSize}px ${font}`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    const lines = text.split('\n');
+                    const lineHeight = fontSize * 1.1;
+                    const startY = posY - ((lines.length - 1) * lineHeight) / 2;
+
+                    lines.forEach((line, index) => {
+                        const y = startY + (index * lineHeight);
+                        ctx.strokeText(line, posX, y);
+                    });
+
+                    // Metin çiz
+                    ctx.fillStyle = color;
+                    lines.forEach((line, index) => {
+                        const y = startY + (index * lineHeight);
+                        ctx.fillText(line, posX, y);
+                    });
+                } else {
+                    // Normal metin (gölge ile)
+                    ctx.font = `${weight} ${fontSize}px ${font}`;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Gölge ayarları
+                    ctx.shadowColor = sColor;
+                    ctx.shadowBlur = blur;
+                    ctx.shadowOffsetX = offset;
+                    ctx.shadowOffsetY = offset;
+
+                    // Metni çiz
+                    const lines = text.split('\n');
+                    const lineHeight = fontSize * 1.2;
+                    const startY = posY - ((lines.length - 1) * lineHeight) / 2;
+
+                    lines.forEach((line, index) => {
+                        ctx.fillText(line, posX, startY + (index * lineHeight));
+                    });
+                }
+
+                // Gölgeyi temizle (diğer metinleri etkilemesin)
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+            });
+        }
+
+        function setTextPosition(position) {
+            switch (position) {
+                case 'center':
+                    textX.value = 400;
+                    textY.value = 200;
+                    break;
+                case 'top':
+                    textX.value = 400;
+                    textY.value = 100;
+                    break;
+                case 'bottom':
+                    textX.value = 400;
+                    textY.value = 300;
+                    break;
+            }
+            updatePositionValues();
+            updatePreview();
+        }
+
+        function updatePositionValues() {
+            textXValue.textContent = textX.value + 'px';
+            textYValue.textContent = textY.value + 'px';
+        }
+
+        function updateEffectValues() {
+            shadowBlurValue.textContent = shadowBlur.value + 'px';
+            shadowOffsetValue.textContent = shadowOffset.value + 'px';
+        }
+
+        async function loadGithubImages() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('create-static-image.html', '');
+
+            // GitHub API kullanarak images klasörünü tara
+            const repoPath = window.location.pathname.split('/').slice(1, -1).join('/');
+            const apiUrl = `https://api.github.com/repos/${repoPath}/contents/images`;
+
+            try {
+                githubImages.innerHTML = '<p>🔄 GitHub images/ klasörü taranıyor...</p>';
+                githubImages.style.display = 'block';
+
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error('GitHub API hatası');
+                }
+
+                const files = await response.json();
+                const imageFiles = files.filter(file =>
+                    file.type === 'file' &&
+                    /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+                );
+
+                if (imageFiles.length === 0) {
+                    githubImages.innerHTML = '<p>📁 images/ klasöründe resim bulunamadı.</p>';
+                    return;
+                }
+
+                let imagesHtml = '<h4>📂 GitHub Images/ Klasöründeki Resimler:</h4><div class="image-grid">';
+
+                imageFiles.forEach(file => {
+                    const imageUrl = `${baseUrl}images/${file.name}`;
+                    imagesHtml += `
+                        <div class="image-item" onclick="selectGithubImage('${imageUrl}', '${file.name}')">
+                            <img src="${imageUrl}" alt="${file.name}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2RkZCIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Resim</text></svg>'">
+                            <span>${file.name}</span>
+                        </div>
+                    `;
+                });
+
+                imagesHtml += '</div>';
+                githubImages.innerHTML = imagesHtml;
+
+            } catch (error) {
+                console.error('GitHub images yüklenirken hata:', error);
+                githubImages.innerHTML = `
+                    <p>❌ GitHub images/ klasörü yüklenemedi.</p>
+                    <p><small>Alternatif: "Özel URL Gir" seçeneğini kullanın.</small></p>
+                `;
+            }
+        }
+
+        function selectGithubImage(imageUrl, fileName) {
+            // Önceki seçimi kaldır
+            document.querySelectorAll('.image-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Yeni seçimi işaretle
+            event.currentTarget.classList.add('selected');
+
+            // Resmi yükle
+            loadBackgroundImage(imageUrl);
+            selectedImageUrl = imageUrl;
+
+            // Select'i güncelle
+            backgroundSelect.value = 'custom';
+            customImageUrl.value = imageUrl;
+            customImageUrl.style.display = 'block';
+        }
+
+        function loadBackgroundImage(url) {
+            if (!url) {
+                backgroundImage = null;
+                updatePreview();
+                return;
+            }
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function () {
+                backgroundImage = img;
+                updatePreview();
+            };
+            img.onerror = function () {
+                alert('❌ Resim yüklenemedi: ' + url);
+                backgroundImage = null;
+                updatePreview();
+            };
+            img.src = url;
+        }
+
+        function downloadAsResimPng() {
+            updatePreview();
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'resim.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('✅ resim.png indirildi! Bu dosyayı GitHub repository\'nizin ana dizinine yükleyin.');
+            }, 'image/png', 1.0);
+        }
+
+        function downloadAsResimJpg() {
+            updatePreview();
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'resim.jpg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                alert('✅ resim.jpg indirildi! Bu dosyayı GitHub repository\'nizin ana dizinine yükleyin.');
+            }, 'image/jpeg', 0.9);
+        }
+
+        // Generate dynamic URL
+        function generateDynamicUrl() {
+            const baseUrl = window.location.origin + window.location.pathname.replace('create-static-image.html', '');
+
+            // Template parametresi ekle
+            let templateParam = '';
+            if (selectedMeme) {
+                templateParam = `&template=${selectedMeme.id}`;
+            } else if (customImageUrl.value.trim()) {
+                templateParam = `&bg=${encodeURIComponent(customImageUrl.value.trim())}`;
+            }
+
+            // Çoklu metin parametreleri oluştur
+            let textParams = '';
+            textBoxes.forEach((box, index) => {
+                if (box.visible && box.text.trim()) {
+                    const prefix = `&t${index}`;
+                    textParams += `${prefix}_text=${encodeURIComponent(box.text)}`;
+                    textParams += `${prefix}_x=${box.x}`;
+                    textParams += `${prefix}_y=${box.y}`;
+                    textParams += `${prefix}_size=${box.fontSize}`;
+                    textParams += `${prefix}_color=${encodeURIComponent(box.color)}`;
+                    textParams += `${prefix}_font=${encodeURIComponent(box.font)}`;
+                    textParams += `${prefix}_weight=${box.weight}`;
+                }
+            });
+
+            // Geriye uyumluluk için ilk metin kutusunu ana parametreler olarak da ekle
+            const firstBox = textBoxes.find(box => box.visible && box.text.trim());
+            let mainParams = '';
+            if (firstBox) {
+                mainParams = `text=${encodeURIComponent(firstBox.text)}&size=${firstBox.fontSize}&color=${encodeURIComponent(firstBox.color)}&font=${encodeURIComponent(firstBox.font)}&weight=${firstBox.weight}&x=${firstBox.x}&y=${firstBox.y}`;
+            }
+
+            const urls = [
+                `${baseUrl}resim.png?${mainParams}${textParams}${templateParam}`,
+                `${baseUrl}resim.jpg?${mainParams}${textParams}${templateParam}`,
+                `${baseUrl}resim.html?${mainParams}${textParams}${templateParam}`
+            ];
+
+            currentUrl = urls[1]; // JPG URL'sini varsayılan yap
+
+            urlDisplay.innerHTML = `
+                <div style="display: grid; gap: 12px;">
+                    <div style="padding: 15px; background: linear-gradient(135deg, #d4edda, #c3e6cb); border-radius: 12px; border-left: 4px solid #28a745;">
+                        <div style="font-weight: 600; color: #155724; margin-bottom: 8px;">✅ JPG Format (ÖNERİLEN)</div>
+                        <code style="word-break: break-all; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 6px; display: block;">${urls[1]}</code>
+                    </div>
+                    
+                    <div style="padding: 15px; background: linear-gradient(135deg, #fff3cd, #ffeaa7); border-radius: 12px; border-left: 4px solid #ffc107;">
+                        <div style="font-weight: 600; color: #856404; margin-bottom: 8px;">🔄 PNG Format</div>
+                        <code style="word-break: break-all; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 6px; display: block;">${urls[0]}</code>
+                    </div>
+                    
+                    <div style="padding: 15px; background: linear-gradient(135deg, #f8d7da, #f5c6cb); border-radius: 12px; border-left: 4px solid #dc3545;">
+                        <div style="font-weight: 600; color: #721c24; margin-bottom: 8px;">📄 HTML Format</div>
+                        <code style="word-break: break-all; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 6px; display: block;">${urls[2]}</code>
+                    </div>
+                    
+                    <div style="padding: 15px; background: linear-gradient(135deg, #d1ecf1, #bee5eb); border-radius: 12px; text-align: center;">
+                        <div style="font-weight: 600; color: #0c5460;">💡 Discord Embed İpucu</div>
+                        <div style="font-size: 14px; color: #0c5460; margin-top: 5px;">JPG formatı Discord'da en güvenilir şekilde çalışır!</div>
+                    </div>
+                </div>
+            `;
+
+            urlResult.classList.add('show');
+        }
+
+        function copyToClipboard() {
+            if (currentUrl) {
+                navigator.clipboard.writeText(currentUrl).then(() => {
+                    alert('✅ En iyi Discord URL kopyalandı! (JPG formatı)\n\nBu URL Discord\'da embed olarak görünecek.');
+                }).catch(() => {
+                    // Fallback - manuel kopyalama için
+                    prompt('Bu URL\'yi kopyalayın:', currentUrl);
+                });
+            }
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            textInput.addEventListener('input', updatePreview);
+
+            fontSizeInput.addEventListener('input', () => {
+                fontSizeValue.textContent = fontSizeInput.value + 'px';
+                updatePreview();
+            });
+
+            colorInput.addEventListener('input', updatePreview);
+            fontFamily.addEventListener('change', updatePreview);
+            fontWeight.addEventListener('change', updatePreview);
+
+            textX.addEventListener('input', () => {
+                updatePositionValues();
+                updatePreview();
+            });
+
+            textY.addEventListener('input', () => {
+                updatePositionValues();
+                updatePreview();
+            });
+
+            shadowBlur.addEventListener('input', () => {
+                updateEffectValues();
+                updatePreview();
+            });
+
+            shadowOffset.addEventListener('input', () => {
+                updateEffectValues();
+                updatePreview();
+            });
+
+            shadowColor.addEventListener('input', updatePreview);
+
+            customImageUrl.addEventListener('input', () => {
+                const url = customImageUrl.value.trim();
+                if (url) {
+                    loadBackgroundImage(url);
+                    memeSearch.value = 'Özel Resim';
+                } else {
+                    backgroundImage = null;
+                    updatePreview();
+                }
+            });
+
+            // Dropdown dışına tıklandığında kapat
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.meme-selector')) {
+                    memeDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // GitHub images (simplified)
+        async function loadGithubImages() {
+            alert('🔄 GitHub Images özelliği geliştiriliyor. Şimdilik "Özel Resim URL" kullanabilirsiniz.');
+        }
+
+        // Event listeners
+        function setupEventListeners() {
+            fontSizeInput.addEventListener('input', () => {
+                fontSizeValue.textContent = fontSizeInput.value + 'px';
+                updatePreview();
+                renderTextBoxes(); // Kutu bilgilerini güncelle
+            });
+
+            colorInput.addEventListener('input', () => {
+                updatePreview();
+                renderTextBoxes();
+            });
+
+            fontFamily.addEventListener('change', () => {
+                updatePreview();
+                renderTextBoxes();
+            });
+
+            fontWeight.addEventListener('change', () => {
+                updatePreview();
+                renderTextBoxes();
+            });
+
+            textX.addEventListener('input', () => {
+                updatePositionValues();
+                updatePreview();
+                renderTextBoxes();
+            });
+
+            textY.addEventListener('input', () => {
+                updatePositionValues();
+                updatePreview();
+                renderTextBoxes();
+            });
+
+            shadowBlur.addEventListener('input', () => {
+                updateEffectValues();
+                updatePreview();
+            });
+
+            shadowOffset.addEventListener('input', () => {
+                updateEffectValues();
+                updatePreview();
+            });
+
+            shadowColor.addEventListener('input', updatePreview);
+
+            customImageUrl.addEventListener('input', () => {
+                const url = customImageUrl.value.trim();
+                if (url) {
+                    loadBackgroundImage(url);
+                    memeSearch.value = 'Özel Resim';
+                } else {
+                    backgroundImage = null;
+                    updatePreview();
+                }
+            });
+
+            // Dropdown dışına tıklandığında kapat
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.meme-selector')) {
+                    memeDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+            setupEventListeners();
+        });
+    </script>
+</body>
+
+</html>
